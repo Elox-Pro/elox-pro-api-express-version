@@ -7,101 +7,64 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        Int      @id @default(autoincrement())
-  updatedAt DateTime @updatedAt @map("updated_at")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  role String
-
-  // Define one-to-one relationship with credentials
-  credential Credential?
-
-  // Define one-to-one relationship with profiles
-  profile Profile?
-
-  // Define one-to-one relationship with company owner (companies)
-  companyOwner Company? @relation(name: "company_owner")
-
-  // Define one-to-one relationship with customers
-  customer Customer?
-
-  //Define in another model
-  // Define one-to-many relationship with staffs (users)
-  companyStaffId Int?     @map("company_staff_id")
-  companyStaff   Company? @relation(name: "company_staffs", fields: [companyStaffId], references: [id])
-
-  // Define one-to-many relationship with user documents
-  documents UserDocument[] @relation(name: "user_documents")
-
-  @@map("users")
-}
-
-model Customer {
-  id        Int      @id @default(autoincrement())
-  updatedAt DateTime @updatedAt @map("updated_at")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  rankPoints Int?
-
-  // Define one-to-one relationship with users
-  userId Int  @unique @map("user_id")
-  user   User @relation(fields: [userId], references: [id])
-
-  // Define one-to-many relationship with customers
-  companyId Int     @map("company_id")
-  company   Company @relation(fields: [companyId], references: [id])
-
-  // Define one-to-many relationship with contacts
-  contacts Contact[] @relation(name: "customer_contacts")
-
-  //TODO:To define one-to-one relationship with rank
-  rankId Int?
-}
-
 model Company {
   id        Int      @id @default(autoincrement())
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  name     String  @unique()
-  imageUrl String? @map("image_url")
-
-  // Define one-to-one relationship with owner (users) 
-  ownerId Int?  @unique @map("owner_id")
-  owner   User? @relation(name: "company_owner", fields: [ownerId], references: [id])
-
-  // Define one-to-many relationship with customers
-  customers Customer[]
-
-  // Define one-to-many relationship with staffs (users)
-  staffs User[] @relation(name: "company_staffs")
+  name         String         @unique()
+  imageUrl     String?        @map("image_url")
+  users        User[]
+  loanSettings LoanSettings[]
 
   @@map("companies")
 }
 
-model Credential {
+model User {
   id        Int      @id @default(autoincrement())
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  email         String    @unique
-  phone         String    @unique
-  username      String    @unique
+  role         String // Values: SYSTEM_ADMIN, COMPANY_OWNER, COMPANY_ADMIN, COMPANY_CUSTOMER
+  credential   UserCredential?
+  profile      UserProfile?
+  userRank     UserRank?
+  KYC          KYC?
+  addresses    Address[]
+  documents    UserDocument[]
+  contacts     UserContact[]
+  bankAccounts UserBankAccount[]
+
+  // Relationships
+  companyId Int     @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id])
+
+  @@map("users")
+}
+
+model UserCredential {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  email    String @unique
+  phone    String @unique
+  username String @unique
+
   password      String
   emailVerified Boolean   @default(false) @map("email_verified")
   phoneVerified Boolean   @default(false) @map("phone_verified")
   authMethod    String?   @map("auth_method")
   lastLoginAt   DateTime? @map("last_login_at")
 
-  // Define one-to-one relationship with users
-  userId Int?  @unique @map("user_id")
-  user   User? @relation(fields: [userId], references: [id])
+  // Relationships
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
 
-  @@map("credentials")
+  @@map("user_credentials")
 }
 
-model Profile {
+model UserProfile {
   id        Int      @id @default(autoincrement())
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
@@ -111,11 +74,11 @@ model Profile {
   gender    String?
   avatarUrl String? @map("avatar_url")
 
-  // Define one-to-one relationship with users
-  userId Int?  @unique @map("user_id")
-  user   User? @relation(fields: [userId], references: [id])
+  // Relationships
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
 
-  @@map("profiles")
+  @@map("user_profiles")
 }
 
 model UserDocument {
@@ -124,27 +87,211 @@ model UserDocument {
   createdAt DateTime @default(now()) @map("created_at")
 
   type             String
-  value            String?
-  description      String?
+  value            String
+  description      String? @db.Text
   documentFrontUrl String? @map("document_front_url")
   documentBackUrl  String? @map("document_back_url")
 
-  // Define one-to-many relationship with users
-  userId Int  @unique @map("user_id")
-  user   User @relation(name: "user_documents", fields: [userId], references: [id])
+  // Relationships
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
 
   @@map("users_documents")
 }
 
-model Contact {
+model Address {
   id        Int      @id @default(autoincrement())
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  type         String // reference, sponsor, guarantor
+  streetAddress    String  @map("street_address")
+  apartamentNumber String? @map("apartament_number")
+  city             String
+  state            String
+  zipCode          String  @map("zip_code")
+  type             String // Values: HOME, WORK
+  isDefault        Boolean @default(false) @map("is_default")
+
+  // Relationships
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  countryId Int     @map("country_id")
+  country   Country @relation(fields: [countryId], references: [id])
+
+  @@map("addresses")
+}
+
+model Country {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  name      String
+  iso2      String
+  e164      Int
+  phoneCode String?   @map("phone_code")
+  addresses Address[]
+
+  @@map("countries")
+}
+
+model UserBankAccount {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  bankName      String  @map("bank_name")
+  accountNumber String  @unique @map("account_number")
+  accountType   String  @map("account_type")
+  isActive      Boolean @default(true) @map("is_active")
+  isPrimary     Boolean @default(false) @map("is_primary")
+  iban          String? @unique
+  bic           String? @unique
+
+  // Relationships
+  userId Int  @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  @@map("user_bank_accounts")
+}
+
+model KYC {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  verified         Boolean   @default(false)
+  rejected         Boolean   @default(false)
+  rejectionReason  String?   @map("rejection_reason")
+  verificationDate DateTime? @map("verification_date")
+
+  // Relationships
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  @@map("KYCs")
+}
+
+model UserContact {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  type         String //Values: REFERENCE, SPONSOR
   relationship String?
 
-  // Define one-to-many relationship with customers
-  customerId Int      @unique @map("customer_id")
-  customer   Customer @relation(name: "customer_contacts", fields: [customerId], references: [id])
+  // Relationships
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  @@map("user_contacts")
+}
+
+model Rank {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  name          String
+  minimumPoints Int        @map("minimum_points")
+  imageUrl      String?    @map("image_url")
+  description   String?    @db.Text
+  userRanks     UserRank[]
+
+  @@map("ranks")
+}
+
+model UserRank {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  points           Int
+  rankTransactions RankTransaction[]
+
+  // Relationships
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  rankId Int  @map("rank_id")
+  rank   Rank @relation(fields: [rankId], references: [id])
+
+  @@map("user_ranks")
+}
+
+model RankTransaction {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  type         String
+  pointsEarned Int     @map("points_earned")
+  description  String? @db.Text
+
+  // Relationships
+  userRankId Int      @map("user_rank_id")
+  userRank   UserRank @relation(fields: [userRankId], references: [id])
+
+  @@map("rank_transactions")
+}
+
+model LoanSettings {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  loanType          String  @map("loan_type")
+  lateFeePercentage Decimal @map("late_fee_percentage") @db.Decimal(5, 2)
+  gracePeriodDays   Int     @map("grace_period_days")
+  defaultDatePeriod Int     @map("default_date_period")
+
+  companyId Int     @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id])
+
+  @@map("loan_settings")
+}
+
+model LoanRepayment {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  paymentDate          DateTime @map("payment_date")
+  amount               Decimal  @db.Decimal(10, 2)
+  principalAmount      Decimal  @map("principal_amount") @db.Decimal(10, 2)
+  interestAmount       Decimal  @map("interest_amount") @db.Decimal(10, 2)
+  lateFeeAmount        Decimal  @map("late_fee_amount") @db.Decimal(10, 2)
+  paymentMethod        String   @map("payment_method")
+  transactionReference String   @map("transaction_reference")
+  transactionUrl       String?  @map("transaction_url")
+  notes                String?  @db.Text
+
+  @@map("loan_repayments")
+}
+
+model LoanSchedule {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  installmentNumber Int      @map("installment_number")
+  dueDate           DateTime @map("due_date")
+
+  principalAmount Decimal  @map("principal_amount") @db.Decimal(10, 2)
+  interestAmount  Decimal  @map("interest_amount") @db.Decimal(10, 2)
+  lateFeeAmount   Decimal  @map("late_fee_amount") @db.Decimal(10, 2)
+  totalPayment    Decimal  @map("total_payment") @db.Decimal(10, 2)
+  paymentStatus   String   @map("payment_status") // Values: "Pending", PENDING, PAID, OVERDUE
+  paidDate        DateTime @map("paid_date")
+
+  @@map("loan_schedules")
+}
+
+model LoanCollateral {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  @@map("loan_collaterals")
 }
