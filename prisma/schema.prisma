@@ -8,151 +8,143 @@ datasource db {
 }
 
 model User {
-  id              Int              @id @default(autoincrement())
-  username        String           @unique
-  password        String
-  authEnabled     Boolean          @default(false) @map("auth_enabled")
-  role            String
-  authMethod      String?          @map("auth_method")
-  // Foreign Keys
-  avatarId        Int?             @map("avatar_id") @relation(fields: [avatarId], references: [id])
-  profileId       Int?             @map("profile_id") @relation(fields: [profileId], references: [id])
-  addressId       Int?             @map("address_id") @relation(fields: [addressId], references: [id])
-  // One-to-many relationship with document details
-  documentDetails DocumentDetail[] @map("document_details")
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  // One-to-many relationship with accounts
-  accounts Account[]
+  role String
 
-  // One-to-many relationship with addresses
-  addresses Address[]
+  // Define one-to-one relationship with credentials
+  credential Credential?
 
-  //  One-to-one relationships
-  adminDetails    UserDetail? @map("admin_details") @relation(fields: [adminDetailsId], references: [id])
-  customerDetails UserDetail? @map("customer_details") @relation(fields: [customerDetailsId], references: [id])
-  lastLoginAt     DateTime?   @map("last_login_at")
-  updatedAt       DateTime    @default(now()) @map("updated_at")
-  createdAt       DateTime    @default(now()) @map("created_at")
+  // Define one-to-one relationship with profiles
+  profile Profile?
+
+  // Define one-to-one relationship with company owner (companies)
+  companyOwner Company? @relation(name: "company_owner")
+
+  // Define one-to-one relationship with customers
+  customer Customer?
+
+  //Define in another model
+  // Define one-to-many relationship with staffs (users)
+  companyStaffId Int?     @map("company_staff_id")
+  companyStaff   Company? @relation(name: "company_staffs", fields: [companyStaffId], references: [id])
+
+  // Define one-to-many relationship with user documents
+  documents UserDocument[] @relation(name: "user_documents")
 
   @@map("users")
 }
 
-model Profile {
-  id            Int      @id @default(autoincrement())
-  name          String
-  lastName      String   @map("last_name")
-  phone         String
-  email         String   @unique
-  gender        String?
-  emailVerified Boolean  @default(false) @map("email_verified")
-  phoneVerified Boolean  @default(false) @map("phone_verified")
-  updatedAt     DateTime @default(now()) @map("updated_at")
-  createdAt     DateTime @default(now()) @map("created_at")
+model Customer {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
 
-  // One-to-one relationship with user
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
+  rankPoints Int?
+
+  // Define one-to-one relationship with users
+  userId Int  @unique @map("user_id")
+  user   User @relation(fields: [userId], references: [id])
+
+  // Define one-to-many relationship with customers
+  companyId Int     @map("company_id")
+  company   Company @relation(fields: [companyId], references: [id])
+
+  // Define one-to-many relationship with contacts
+  contacts Contact[] @relation(name: "customer_contacts")
+
+  //TODO:To define one-to-one relationship with rank
+  rankId Int?
+}
+
+model Company {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  name     String  @unique()
+  imageUrl String? @map("image_url")
+
+  // Define one-to-one relationship with owner (users) 
+  ownerId Int?  @unique @map("owner_id")
+  owner   User? @relation(name: "company_owner", fields: [ownerId], references: [id])
+
+  // Define one-to-many relationship with customers
+  customers Customer[]
+
+  // Define one-to-many relationship with staffs (users)
+  staffs User[] @relation(name: "company_staffs")
+
+  @@map("companies")
+}
+
+model Credential {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  email         String    @unique
+  phone         String    @unique
+  username      String    @unique
+  password      String
+  emailVerified Boolean   @default(false) @map("email_verified")
+  phoneVerified Boolean   @default(false) @map("phone_verified")
+  authMethod    String?   @map("auth_method")
+  lastLoginAt   DateTime? @map("last_login_at")
+
+  // Define one-to-one relationship with users
+  userId Int?  @unique @map("user_id")
+  user   User? @relation(fields: [userId], references: [id])
+
+  @@map("credentials")
+}
+
+model Profile {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  firstName String
+  lastName  String
+  gender    String?
+  avatarUrl String? @map("avatar_url")
+
+  // Define one-to-one relationship with users
+  userId Int?  @unique @map("user_id")
+  user   User? @relation(fields: [userId], references: [id])
 
   @@map("profiles")
 }
 
-model DocumentDetail {
-  id               Int      @id @default(autoincrement())
+model UserDocument {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
   type             String
-  number           String
+  value            String?
   description      String?
-  documentFrontUrl String?  @map("document_front_url")
-  documentBackUrl  String?  @map("document_back_url")
-  // Many-to-One relationship with User
-  userId           Int      @map("user_id") @relation(fields: [userId], references: [id], onDelete: Cascade)
-  user             User?
-  updatedAt        DateTime @default(now()) @map("updated_at")
-  createdAt        DateTime @default(now()) @map("created_at")
+  documentFrontUrl String? @map("document_front_url")
+  documentBackUrl  String? @map("document_back_url")
 
-  @@map("document_details")
+  // Define one-to-many relationship with users
+  userId Int  @unique @map("user_id")
+  user   User @relation(name: "user_documents", fields: [userId], references: [id])
+
+  @@map("users_documents")
 }
 
-model UserDetail {
-  id           Int      @id @default(autoincrement())
-  // Foreign Keys
-  ownerId      Int      @map("owner_id") @relation(fields: [ownerId], references: [id])
-  referredById Int?     @map("referred_by_id") @relation(fields: [referredById], references: [id])
-  referenceId  Int?     @map("reference_id") @relation(fields: [referenceId], references: [id])
-  rankId       Int?     @map("rank_id") @relation(fields: [rankId], references: [id])
-  // Additional fields
+model Contact {
+  id        Int      @id @default(autoincrement())
+  updatedAt DateTime @updatedAt @map("updated_at")
+  createdAt DateTime @default(now()) @map("created_at")
+
+  type         String // reference, sponsor, guarantor
   relationship String?
-  rankPoints   Int      @map("rank_points")
-  updatedAt    DateTime @default(now()) @map("updated_at")
-  createdAt    DateTime @default(now()) @map("created_at")
 
-  // One-to-one relationship with User
-  user       User? @relation(fields: [ownerId], references: [id])
-  referredBy User? @map("referred_by") @relation(fields: [referredById], references: [id])
-  reference  User? @relation(fields: [referenceId], references: [id])
-  rank       Rank? @relation(fields: [rankId], references: [id])
-
-  @@map("user_details")
-}
-
-model KYC {
-  id               Int       @id @default(autoincrement())
-  // Foreign Keys
-  userId           Int       @map("user_id") @relation(fields: [userId], references: [id], onDelete: Cascade)
-  // Flags
-  verified         Boolean   @default(false)
-  rejected         Boolean   @default(false)
-  // Rejection details
-  rejectionReason  String?   @map("rejection_reason")
-  verificationDate DateTime? @map("verification_date")
-  updatedAt        DateTime  @default(now()) @map("updated_at")
-  createdAt        DateTime  @default(now()) @map("created_at")
-
-  // One-to-one relationship with User
-  user User? @relation(fields: [userId], references: [id])
-
-  @@maps("KYCs")
-}
-
-model Address {
-  id               Int       @id @default(autoincrement())
-  streetAddress    String    @map("street_address")
-  apartamentNumber String?   @map("apartament_number")
-  city             String
-  state            String
-  countryId        Int       @map("country_id") @relation(fields: [countryId], references: [id], onDelete: Cascade)
-  zipCode          String    @map("zip_code")
-  type             String
-  isDefault        Boolean   @default(false) @map("is_default")
-  updatedAt        DateTime? @default(now()) @map("update_at")
-  createdAt        DateTime? @default(now()) @map("created_at")
-
-  // One-to-many relationship with User
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  // One-to-one relationship with country
-  country Country? @relation(fields: [countryId], references: [id])
-
-  @@map("addresses")
-}
-
-model Account {
-  id            Int       @id @default(autoincrement())
-  // Foreign Keys
-  userId        Int       @map("user_id") @relation(fields: [userId], references: [id], onDelete: Cascade)
-  ownerId       Int?      @map("owner_id") @relation(fields: [ownerId], references: [id])
-  // Account details
-  accountNumber String    @unique @map("account_number")
-  accountType   String    @map("account_type")
-  isActive      Boolean   @default(true) @map("is_active")
-  isPrimary     Boolean   @default(false) @map("is_primary")
-  bankName      String    @map("bank_name")
-  iban          String?   @unique
-  bic           String?   @unique
-  // Account metadata
-  updatedAt     DateTime? @default(now()) @map("update_at")
-  createdAt     DateTime? @default(now()) @map("created_at")
-
-  // One-to-many relationship with User
-  user User? @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  owner User? @relation(fields: [ownerId], references: [id])
+  // Define one-to-many relationship with customers
+  customerId Int      @unique @map("customer_id")
+  customer   Customer @relation(name: "customer_contacts", fields: [customerId], references: [id])
 }
