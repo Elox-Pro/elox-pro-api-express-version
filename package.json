@@ -2,7 +2,7 @@
   "name": "elox-pro-api",
   "version": "1.0.0",
   "description": "Easy Loan Express Professional API (Elox Pro API)",
-  "main": "index.ts",
+  "main": "server.ts",
   "scripts": {
     "start": "nodemon",
     "test": "echo \"Error: no test specified\" && exit 1"
