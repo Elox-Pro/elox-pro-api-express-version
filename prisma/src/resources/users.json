@@ -1,0 +1,11 @@
+[
+    {
+        "role": "SYSTEM_ADMIN",
+        "credential": {
+            "email": "yonax73@gmail.com",
+            "password": "eloxpro",
+            "emailVerified": true,
+            "authMethod": "EMAIL"
+        }
+    }
+]
