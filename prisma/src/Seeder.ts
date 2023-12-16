@@ -1,11 +1,11 @@
 import { PrismaClient } from "@prisma/client"
 
 export default class Seeder {
-  private prisma: PrismaClient
+    private readonly prisma: PrismaClient
 
-  constructor(prisma: PrismaClient) {
-    this.prisma = prisma
-  }
+    constructor(prisma: PrismaClient) {
+        this.prisma = prisma
+    }
 
-  async seed() {}
+    async seed() { }
 }
