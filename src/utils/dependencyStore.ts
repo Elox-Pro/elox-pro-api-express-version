@@ -1,17 +1,12 @@
-import DependencyManager from "helpers/DependencyManager";
-import prisma from "./prismaClient"
-import UserService from "services/UserService";
+import DependencyManager from "../helpers/DependencyManager";
+import UserService from "../services/impl/UserService";
+import IUserService from "../services/IUserService";
 
 const manager = new DependencyManager();
 
-const useUserService = () => {
-    const us: UserService = manager.resolve(UserService.name, () => {
-        const userService: UserService = new UserService(prisma);
+export const useUserService = (): IUserService => {
+    return manager.resolve(UserService.name, () => {
+        const userService = new UserService();
         return userService;
     })
-    return us;
 }
-
-
-
-

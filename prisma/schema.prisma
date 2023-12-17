@@ -68,7 +68,7 @@ model User {
 
   // The relationship between the user and the company
   // the SYSTEM_ADMIN role does not have any relationship with any company
-  companyId Int      @map("company_id")
+  companyId Int?     @map("company_id")
   company   Company? @relation(fields: [companyId], references: [id])
 
   @@map("users")

@@ -4,7 +4,7 @@ export type User = {
     updatedAt: Date
     createdAt: Date
     role: String,
-    credential: UserCredential
+    credential: UserCredential | null
 }
 
 export type UserCredential = {
