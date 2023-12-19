@@ -1,6 +1,8 @@
 import DependencyManager from "../helpers/DependencyManager";
-import UserService from "../services/impl/UserService";
 import IUserService from "../services/IUserService";
+import UserService from "../services/impl/UserService";
+import ICountryService from "../services/ICountryService";
+import CountryService from "../services/impl/CountryService";
 
 const manager = new DependencyManager();
 
@@ -8,5 +10,12 @@ export const useUserService = (): IUserService => {
     return manager.resolve(UserService.name, () => {
         const userService = new UserService();
         return userService;
+    })
+}
+
+export const useCountryService = (): ICountryService => {
+    return manager.resolve(CountryService.name, () => {
+        const countryService = new CountryService();
+        return countryService;
     })
 }

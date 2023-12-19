@@ -2,6 +2,7 @@
     {
         "role": "SYSTEM_ADMIN",
         "credential": {
+            "username": "yonax73",
             "email": "yonax73@gmail.com",
             "password": "eloxpro",
             "emailVerified": true,

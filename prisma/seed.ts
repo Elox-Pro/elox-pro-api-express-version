@@ -1,16 +1,16 @@
-import { PrismaClient } from "@prisma/client"
-import Seeder from "./src/Seeder"
+import DBSeeder from "../src/helpers/DBSeeder";
 
 (async function main() {
-    const prisma = new PrismaClient()
-    try {
 
-        const seeder = new Seeder(prisma)
-        await seeder.seed()
+    try {
+        console.log('Running...');
+
+        const seeder = new DBSeeder();
+        await seeder.seed();
+
+        console.log('...Done! ✅');
 
     } catch (error) {
-        console.error(error)
-    } finally {
-        await prisma.$disconnect()
+        console.error('🚨 Error seeding database', error);
     }
-})()
+})();
