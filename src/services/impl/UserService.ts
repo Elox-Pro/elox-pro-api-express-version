@@ -1,9 +1,8 @@
-import { genSalt, hash } from "bcryptjs";
-
+import { User } from "types/models";
 import IUserService from "../../services/IUserService";
 import IUserRepository from "../../repositories/IUserRepository";
 import UserRepository from "../../repositories/impl/UserRepository";
-import { User } from "types/models";
+import { hashPassword } from "../../utils/encryptUtils";
 
 export default class UserService implements IUserService {
     private userRepository: IUserRepository;
@@ -37,14 +36,4 @@ export default class UserService implements IUserService {
     }
 }
 
-async function hashPassword(password: string): Promise<string> {
-    try {
-        const saltRounds = 10;
-        const salt = await genSalt(saltRounds);
-        const hashedPassword = await hash(password, salt);
-        return hashedPassword;
-    } catch (error) {
-        console.error('Error hashing password:', error);
-        throw error;
-    }
-}
+
