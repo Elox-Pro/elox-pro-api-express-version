@@ -1,22 +1,21 @@
 import { JwtPayload, SignOptions, sign, verify } from 'jsonwebtoken';
 
-export interface IUserPayload extends JwtPayload {
-    userId: number;
+interface IJWTParams {
+    accessTokenKey: string,
+    accessTokenExpiresIn: string,
+    refreshTokenKey: string,
+    refreshTokenExpiresIn: string
 }
 
-export class JWTWrapper<T> {
+export default abstract class JWTAsync<T extends JwtPayload> {
 
-    private secret: string;
-    private expiresIn: number;
-    private issuer: string;
+    protected params: IJWTParams;
 
-    constructor(secret: string, expiresIn: number, issuer: string) {
-        this.secret = secret;
-        this.expiresIn = parseInt(expiresIn.toString());
-        this.issuer = issuer;
+    constructor(params: IJWTParams) {
+        this.params = params;
     }
 
-    private signAsync(payload: T, audience: string): Promise<string> {
+    protected signAsync(payload: T, audience: string): Promise<string> {
         const options: SignOptions = {
             expiresIn: this.expiresIn,
             issuer: this.issuer,
@@ -41,7 +40,7 @@ export class JWTWrapper<T> {
         });
     }
 
-    private verifyAsync(token: string): Promise<T> {
+    protected verifyAsync(token: string): Promise<T> {
         return new Promise((resolve, reject) => {
             verify(token, this.secret, (err, payload) => {
 
@@ -59,12 +58,8 @@ export class JWTWrapper<T> {
         });
     }
 
-    public async sign(payload: T, audience: string): Promise<string> {
-        return await this.signAsync(payload, audience);
-    }
+    abstract sign(payload: T, audience: string): Promise<string>;
 
-    public async verify(token: string): Promise<T> {
-        return await this.verifyAsync(token);
-    }
+    abstract verify(token: string): Promise<T>;
 
 }

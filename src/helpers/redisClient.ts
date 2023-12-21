@@ -1,22 +1,21 @@
-import redis from 'redis';
+import { createClient, RedisClientType } from 'redis';
+import config from "../config";
 
-// Interface for Redis client configuration
 interface RedisConfig {
-    host?: string;
-    port?: number;
+    host: string;
+    port: number;
     password?: string;
 }
 
-// Default configuration with options for customization
 const defaultConfig: RedisConfig = {
-    host: 'localhost',
-    port: 6379,
-};
+    host: config.REDIS_HOST,
+    port: parseInt(config.REDIS_PORT)
+}
 
 /**
  * Redis client instance for interacting with the Redis database.
  */
-const client = redis.createClient(defaultConfig);
+const client: RedisClientType = createClient(defaultConfig);
 
 /**
  * Initializes the Redis client connection.
