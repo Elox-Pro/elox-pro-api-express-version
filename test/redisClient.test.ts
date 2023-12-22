@@ -1,7 +1,6 @@
 import { expect, describe, it } from '@jest/globals';
 import redisClient from '../src/helpers/redisClient';
 
-
 describe('Redis client', () => {
 
     const key = 'ts-test-my-key';
