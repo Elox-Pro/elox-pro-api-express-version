@@ -2,7 +2,7 @@ import { JwtPayload, SignOptions, sign, verify, VerifyOptions } from 'jsonwebtok
 
 /**
  * Class for handling JWT operations asynchronously, with enhanced error handling,
- * algorithm flexibility, and type safety.
+ * and type safety.
  * 
  * @author Yonatan A Quintero R
  * @date 2023-12-22

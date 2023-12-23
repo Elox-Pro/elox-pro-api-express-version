@@ -8,11 +8,11 @@ const prisma = new PrismaClient({
 })
 
 prisma.$on('warn', (e) => {
-    console.log(e)
+    console.warn(e)
 })
 
 prisma.$on('error', (e) => {
-    console.log(e)
+    console.error(e)
 })
 
 export default prisma;

@@ -1,35 +1,29 @@
 import {
-    UserRole,
-    AuthenticationMethod
-} from "./enums";
+    User,
+    UserCredential,
+    Country
+} from "@prisma/client";
 
-type base = {
-    id: number
-    updatedAt: Date
-    createdAt: Date
+export enum UserRole {
+    SYSTEM_ADMIN,
+    COMPANY_OWNER,
+    COMPANY_ADMIN,
+    COMPANY_CUSTOMER
 }
 
-export type User = {
+export enum AuthenticationMethod {
+    EMAIL,
+    PHONE
+}
+
+export type TUser = {
     role: UserRole | string,
-    credential: UserCredential | null
-} & base;
+    credential?: UserCredential
+} & User;
 
-export type UserCredential = {
-    email: string
-    phone: string
-    username: string
-    password: string
-    emailVerified: boolean
-    phoneVerified: boolean
-    authMethod: AuthenticationMethod | string
-    lastLoginAt: Date
-    user: User
-} & base;
+export type TUserCredential = {
+    authMethod?: AuthenticationMethod | string
+    user?: User
+} & UserCredential;
 
-export type Country = {
-    name: string,
-    iso2: string,
-    e164: number,
-    ccy: string,
-    lang: string
-} & base;
+export type TCountry = {} & Country;

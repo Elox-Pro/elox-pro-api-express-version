@@ -1,4 +1,4 @@
-import { User, Country } from "types/models";
+import { TUser, TCountry } from "types/models";
 import { fileToJson } from "../utils/fileUtils";
 import {
     useUserService,
@@ -25,13 +25,13 @@ export default class DBSeeder {
 
 const seedUsers = async () => {
     const fileName = `${filePath}/users.json`;
-    const users = fileToJson<User[]>(fileName);
+    const users = fileToJson<TUser[]>(fileName);
     const promises = users.map(user => userService.createUser(user));
     await Promise.all(promises);
 }
 
 const seedCountries = async () => {
     const fileName = `${filePath}/countries.json`;
-    const countries = fileToJson<Country[]>(fileName);
+    const countries = fileToJson<TCountry[]>(fileName);
     await countryService.createManyCountries(countries);
 }

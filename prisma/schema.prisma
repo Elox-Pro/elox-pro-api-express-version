@@ -80,10 +80,10 @@ model UserCredential {
   updatedAt DateTime @updatedAt @map("updated_at")
   createdAt DateTime @default(now()) @map("created_at")
 
-  email    String? @unique
+  username String  @unique
+  email    String  @unique
+  password String
   phone    String? @unique
-  username String? @unique
-  password String?
 
   // Flat indication email verification status
   emailVerified Boolean @default(false) @map("email_verified")

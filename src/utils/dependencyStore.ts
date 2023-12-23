@@ -1,8 +1,8 @@
 import DependencyManager from "../helpers/DependencyManager";
 import IUserService from "../services/IUserService";
-import UserService from "../services/impl/UserService";
+import UserService from "../services/UserService";
 import ICountryService from "../services/ICountryService";
-import CountryService from "../services/impl/CountryService";
+import CountryService from "../services/CountryService";
 
 const manager = new DependencyManager();
 
