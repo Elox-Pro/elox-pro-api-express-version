@@ -120,9 +120,9 @@ export class JwtError extends Error {
 }
 
 /**
- * Interface for user-specific payload data to be included in JWTs.
+ * Type for user-specific payload data to be included in JWTs.
  * Extends the JwtPayload interface to add user properties.
  */
-export interface IJwtUserPayload extends JwtPayload {
+export type IJwtUserPayload = {
     userId: number;
-}
+} & JwtPayload;

@@ -1,53 +1,32 @@
-import { isPasswordMatched } from "../utils/encryptUtils";
-import UserCredentialRepository from "../repositories/UserCredentialRepository";
-import { AuthenticationMethod, TUserCredential } from "types/models";
+import IEncryptUtils from "../utils/IEncryptUtils";
+import ICodeGenerator from "../utils/ICodeGenerator";
+import IUserCredentialRepository from "../repositories/IUserCredentialRepository";
+import IUserRepository from "../repositories/IUserRepository";
+import { TUser, TUserCredential } from "types/prismaTypes";
+import { AuthenticationMethod, CodeType } from "../utils/constants";
 
-export default class UserCredentialService {
-    private userCredentialRepository: UserCredentialRepository;
+export type TUserCredentialServiceParams = {
+    encryptUtils: IEncryptUtils,
+    codeGenerator: ICodeGenerator,
+    userCredentialRepository: IUserCredentialRepository<TUserCredential>,
+    userRepository: IUserRepository<TUser>
+}
 
-    constructor(userCredentialRepository: UserCredentialRepository) {
-        this.userCredentialRepository = userCredentialRepository;
+export class UserCredentialService {
+
+    private readonly AUTHENTICATION_CODE_EXPIRES_IN: number = 60 * 5;
+
+    private readonly userCredentialRepository: IUserCredentialRepository<TUserCredential>;
+    private readonly userRepository: IUserRepository<TUser>;
+    private readonly codeGenerator: ICodeGenerator;
+    private readonly encryptUtils: IEncryptUtils;
+
+    constructor(params: TUserCredentialServiceParams) {
+        this.userCredentialRepository = params.userCredentialRepository;
+        this.userRepository = params.userRepository;
+        this.codeGenerator = params.codeGenerator;
+        this.encryptUtils = params.encryptUtils;
     }
-    async login(credential: TUserCredential): Promise<TUserCredential | null> {
-        try {
 
-            if (!credential.username) {
-                throw new Error("Username is required");
-            }
-
-            if (!credential.password) {
-                throw new Error("Password is required");
-            }
-
-            const savedCredential = await this.userCredentialRepository
-                .findUniqueByUsername(credential.username);
-
-            if (!savedCredential) {
-                throw new Error("Login failed");
-            }
-
-            if (!savedCredential.email) {
-                throw new Error("Email is required");
-            }
-
-            if (!savedCredential.emailVerified) {
-                throw new Error("Email is not verified");
-            }
-
-            if (!isPasswordMatched(credential.password, savedCredential.password)) {
-                throw new Error("Login failed");
-            }
-
-            if (savedCredential.authMethod === AuthenticationMethod.EMAIL.toString()) {
-
-            }
-
-            return null;
-
-        } catch (error) {
-            console.error("Error trying to login user: ", error);
-            throw error;
-        }
-    }
 
 }

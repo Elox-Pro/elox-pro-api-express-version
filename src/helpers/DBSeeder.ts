@@ -1,4 +1,4 @@
-import { TUser, TCountry } from "types/models";
+import { TUser, TCountry } from "types/prismaTypes";
 import { fileToJson } from "../utils/fileUtils";
 import {
     useUserService,

@@ -15,7 +15,7 @@ const defaultConfig: RedisConfig = {
 /**
  * Redis client instance for interacting with the Redis database.
  */
-const client: RedisClientType = createClient(defaultConfig);
+const redis: RedisClientType = createClient(defaultConfig);
 
 /**
  * Initializes the Redis client connection.
@@ -23,7 +23,7 @@ const client: RedisClientType = createClient(defaultConfig);
  * @returns {Promise<void>} A Promise that resolves when the client is connected.
  */
 const init = async () => {
-    await client.connect();
+    await redis.connect();
 };
 
 // Handle potential errors during initialization
@@ -34,14 +34,14 @@ init().catch((err) => console.log(err));
 /**
  * Logs a message when the client connects to Redis.
  */
-client.on('connect', () => {
+redis.on('connect', () => {
     console.log('Client connected to Redis...');
 });
 
 /**
  * Logs a message when the client is fully ready for use.
  */
-client.on('ready', () => {
+redis.on('ready', () => {
     console.log('Client connected to Redis and ready to use');
 });
 
@@ -50,14 +50,14 @@ client.on('ready', () => {
  *
  * @param {Error} err The error object.
  */
-client.on('error', (err) => {
+redis.on('error', (err) => {
     console.log(err.message);
 });
 
 /**
  * Logs a message when the client disconnects from Redis.
  */
-client.on('end', () => {
+redis.on('end', () => {
     console.log('Client disconnected from Redis');
 });
 
@@ -65,8 +65,8 @@ client.on('end', () => {
  * Gracefully closes the Redis client connection when the process receives a SIGINT signal (e.g., Ctrl+C).
  */
 process.on('SIGINT', () => {
-    client.quit();
+    redis.quit();
 });
 
 // Export the Redis client for use in other parts of the application
-export default client;
+export default redis;

@@ -1,24 +1,30 @@
+import IUserRepository from "../../repositories/IUserRepository";
+import prisma from "../../helpers/prismaClient";
+import { TUser } from "types/prismaTypes";
 
-import prisma from "../helpers/prismaClient";
-import { TUser } from "types/models";
-
-export default class UserRepository {
+export class UserRepository implements IUserRepository<TUser> {
     async create(user: TUser): Promise<TUser> {
         try {
+
+            const credential = user.credential;
+
+            if (!credential) {
+                throw new Error("Credential is required");
+            }
 
             const createdUser = await prisma.user.create({
                 data: {
                     role: user.role,
                     credential: {
                         create: {
-                            username: user.credential?.username,
-                            email: user.credential?.email,
-                            password: user.credential?.password,
-                            emailVerified: user.credential?.emailVerified,
-                            authMethod: user.credential?.authMethod
+                            username: credential.username,
+                            email: credential.email,
+                            password: credential.password,
+                            authMethod: credential.authMethod
                         }
                     }
-                }, include: {
+                },
+                include: {
                     credential: true
                 }
             });
