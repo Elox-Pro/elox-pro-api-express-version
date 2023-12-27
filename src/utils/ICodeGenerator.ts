@@ -1,7 +1,6 @@
 import { RedisClientType } from "redis";
 
 export default interface ICodeGenerator {
-
     /**
      * Generate a unique code for the given audience and type
      * @param type the type of code being generated

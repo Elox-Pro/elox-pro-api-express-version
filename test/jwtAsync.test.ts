@@ -1,6 +1,7 @@
 import { expect, test } from '@jest/globals';
-import { JwtAsync, IJwtUserPayload } from '../src/helpers/JWTAsync';
+import JwtUser from '../src/helpers/JwtUser';
 import config from '../src/config';
+import { TJwtUserPayload } from '../src/types/appTypes';
 const {
     JWT_ISSUER,
     JWT_AUDIENCE,
@@ -11,8 +12,8 @@ const {
 } = config;
 
 test('should sign a payload and return a token', async () => {
-    const payload: IJwtUserPayload = { userId: 123 };
-    const accessToken = new JwtAsync<IJwtUserPayload>(
+    const payload: TJwtUserPayload = { userId: 123 };
+    const accessToken = new JwtUser(
         JWT_ISSUER,
         JWT_AUDIENCE,
         JWT_ACCESS_TOKEN_SECRET,
@@ -26,8 +27,8 @@ test('should sign a payload and return a token', async () => {
 });
 
 test('should verify a valid token and return the payload', async () => {
-    const payload: IJwtUserPayload = { userId: 123 };
-    const refreshToken = new JwtAsync<IJwtUserPayload>(
+    const payload: TJwtUserPayload = { userId: 123 };
+    const refreshToken = new JwtUser(
         JWT_ISSUER,
         JWT_AUDIENCE,
         JWT_REFRESH_TOKEN_SECRET,
@@ -43,7 +44,7 @@ test('should verify a valid token and return the payload', async () => {
 
 test('should throw an error if verifying an invalid token', async () => {
     const token = 'invalid-token';
-    const accessToken = new JwtAsync<IJwtUserPayload>(
+    const accessToken = new JwtUser(
         JWT_ISSUER,
         JWT_AUDIENCE,
         JWT_ACCESS_TOKEN_SECRET,

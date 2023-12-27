@@ -1,15 +1,8 @@
 import {
     User,
-    UserCredential,
     Country
 } from "@prisma/client";
+import { TAppUser } from "./appTypes";
 
-export type TUser = {
-    credential?: UserCredential
-} & User;
-
-export type TUserCredential = {
-    user?: User
-} & UserCredential;
-
+export type TUser = {} & User & TAppUser;
 export type TCountry = {} & Country;

@@ -1,6 +1,6 @@
 import ICountryRepository from "../../repositories/ICountryRepository";
 import prisma from "../../helpers/prismaClient";
-import { TCountry } from "types/prismaTypes";
+import { TCountry } from "../../types/prismaTypes";
 
 export default class CountryRepository implements ICountryRepository<TCountry> {
     async createManyCountries(countries: TCountry[]): Promise<number> {

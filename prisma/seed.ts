@@ -13,4 +13,5 @@ import DBSeeder from "../src/helpers/DBSeeder";
     } catch (error) {
         console.error('🚨 Error seeding database', error);
     }
+
 })();

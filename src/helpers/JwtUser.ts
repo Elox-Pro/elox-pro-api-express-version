@@ -1,4 +1,6 @@
-import { JwtPayload, SignOptions, sign, verify, VerifyOptions } from 'jsonwebtoken';
+import { SignOptions, sign, verify, VerifyOptions } from 'jsonwebtoken';
+import IJwtAsync from './IJwtAsync';
+import { TJwtUserPayload } from '../types/appTypes';
 
 /**
  * Class for handling JWT operations asynchronously, with enhanced error handling,
@@ -9,7 +11,7 @@ import { JwtPayload, SignOptions, sign, verify, VerifyOptions } from 'jsonwebtok
  *
  * @template T - The type of the payload to be used in JWTs.
  */
-export class JwtAsync<T extends JwtPayload> {
+export default class JwtUser implements IJwtAsync<TJwtUserPayload> {
 
     /**
     * The issuer of the JWTs.
@@ -52,7 +54,7 @@ export class JwtAsync<T extends JwtPayload> {
      * @param payload - The payload to include in the JWT.
      * @returns A Promise that resolves with the generated JWT token, or rejects with an error.
      */
-    public signAsync(payload: T): Promise<string> {
+    public signAsync(payload: TJwtUserPayload): Promise<string> {
 
         const options: SignOptions = {
             issuer: this.issuer,
@@ -83,7 +85,7 @@ export class JwtAsync<T extends JwtPayload> {
      * @param token - The JWT token to verify.
      * @returns A Promise that resolves with the verified payload, or rejects with an error.
      */
-    public verifyAsync(token: string): Promise<T> {
+    public verifyAsync(token: string): Promise<TJwtUserPayload> {
 
         const options: VerifyOptions = {
             issuer: this.issuer,
@@ -101,28 +103,9 @@ export class JwtAsync<T extends JwtPayload> {
                     return reject(new JwtError('Invalid token'));
                 }
 
-                return resolve(payload as T);
+                return resolve(payload as TJwtUserPayload);
 
             });
         });
     }
 }
-
-/**
- * Custom error class for JWT-related errors.
- */
-export class JwtError extends Error {
-    public originalError: Error | undefined;
-    constructor(message: string, originalError?: Error) {
-        super(message);
-        this.originalError = originalError;
-    }
-}
-
-/**
- * Type for user-specific payload data to be included in JWTs.
- * Extends the JwtPayload interface to add user properties.
- */
-export type IJwtUserPayload = {
-    userId: number;
-} & JwtPayload;

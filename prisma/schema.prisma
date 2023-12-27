@@ -31,11 +31,32 @@ model User {
   // Values: SYSTEM_ADMIN, COMPANY_OWNER, COMPANY_ADMIN, COMPANY_CUSTOMER
   role String
 
-  // The user credentials to log in to the system
-  credential UserCredential?
+  username  String  @unique
+  email     String  @unique
+  password  String
+  firstName String?
+  lastName  String?
+  phone     String? @unique
 
-  // Additonal user information
-  profile UserProfile?
+  // Gender (e.g., Male, Female)
+  gender String?
+
+  avatarUrl String? @map("avatar_url")
+
+  // Flat indication email verification status
+  emailVerified Boolean @default(false) @map("email_verified")
+
+  // Flag indicating phone verification status
+  phoneVerified Boolean @default(false) @map("phone_verified")
+
+  // Flag indicating if the second authentication is required
+  secondAuthRequired Boolean @default(true) @map("auth_required")
+
+  // The secons authentication method (e.g., email, phone number)
+  secondAuthMethod String? @map("auth_method")
+
+  // Last login timestamp
+  lastLoginAt DateTime? @map("last_login_at")
 
   // Information related with the customer ranks
   customerRank UserRank?
@@ -72,59 +93,6 @@ model User {
   company   Company? @relation(fields: [companyId], references: [id])
 
   @@map("users")
-}
-
-// This model stores information related to the user credentials and their authentication
-model UserCredential {
-  id        Int      @id @default(autoincrement())
-  updatedAt DateTime @updatedAt @map("updated_at")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  username String  @unique
-  email    String  @unique
-  password String
-  phone    String? @unique
-
-  // Flat indication email verification status
-  emailVerified Boolean @default(false) @map("email_verified")
-
-  // Flag indicating phone verification status
-  phoneVerified Boolean @default(false) @map("phone_verified")
-
-  // Authentication method (e.g., email, phone number)
-  authMethod String? @map("auth_method")
-
-  // Last login timestamp
-  lastLoginAt DateTime? @map("last_login_at")
-
-  // Relationships
-
-  userId Int  @unique @map("user_id")
-  user   User @relation(fields: [userId], references: [id])
-
-  @@map("user_credentials")
-}
-
-// This model stores additional profile information for users
-model UserProfile {
-  id        Int      @id @default(autoincrement())
-  updatedAt DateTime @updatedAt @map("updated_at")
-  createdAt DateTime @default(now()) @map("created_at")
-
-  firstName String
-  lastName  String
-
-  // Gender (e.g., Male, Female)
-  gender String?
-
-  avatarUrl String? @map("avatar_url")
-
-  // Relationships
-
-  userId Int  @unique @map("user_id")
-  user   User @relation(fields: [userId], references: [id])
-
-  @@map("user_profiles")
 }
 
 // This model stores document information about the user, it’s useful to store kyc information.
