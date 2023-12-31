@@ -7,11 +7,6 @@ import { AuthenticationMethod, CodeType, UserRole } from "../../utils/constants"
 import { TJwtUserPayload, TUserServiceParams } from "../../types/appTypes";
 import IJwtAsync from "../../helpers/IJwtAsync";
 
-type TGenerateJwtokensResult = {
-    accessToken: string;
-    refreshToken: string;
-}
-
 export default class UserService implements IUserService<TUser> {
 
     private readonly AUTHENTICATION_CODE_EXPIRES_IN: number = 60 * 5;
@@ -98,13 +93,11 @@ export default class UserService implements IUserService<TUser> {
             /**
              * If the second authentication is not required create the access token and refresh token and return the user
              */
+
             if (!savedUser.secondAuthMethod) {
 
-                const tokens = await this.generateJwtTokens(savedUser);
-                savedUser.accessToken = tokens.accessToken;
-                savedUser.refreshToken = tokens.refreshToken;
-
                 savedUser.isWaitingForAuthCode = false;
+                this.setUserTokens(savedUser);
 
                 return savedUser;
             }
@@ -113,21 +106,11 @@ export default class UserService implements IUserService<TUser> {
              * If the second authentication is required create the authentication code, send the    notification to the user and return the user
              */
 
-            // flag to indacate the user is waiting for the authentication code
-            savedUser.isWaitingForAuthCode = true;
-
-            // TODO: Update constructor 
-            const code = this.codeGenerator.generate(
-                CodeType.AUTHENTICATION,
-                savedUser.username,
-                this.AUTHENTICATION_CODE_EXPIRES_IN
-            );
+            const code = await this.generateAuthCode(savedUser);
 
             if (savedUser.secondAuthMethod === AuthenticationMethod.EMAIL) {
-
-
-            } else if (savedUser.secondAuthMethod === AuthenticationMethod.PHONE) {
-
+                savedUser.isWaitingForAuthCode = true;
+                // sendEmailNotification
             }
 
             return savedUser;
@@ -148,15 +131,23 @@ export default class UserService implements IUserService<TUser> {
         }
     }
 
-    private async generateJwtTokens(user: TUser): Promise<TGenerateJwtokensResult> {
-
-        const [accessToken, refreshToken] = await Promise.all([
-            this.userAccessToken.signAsync({ userId: user.id }),
-            this.userRefresToken.signAsync({ userId: user.id })
-        ]);
-
-        return { accessToken, refreshToken };
+    private async setUserTokens(user: TUser): Promise<void> {
+        user.accessToken = await this.userAccessToken.signAsync({
+            userId: user.id
+        });
+        user.refreshToken = await this.userRefresToken.signAsync({
+            userId: user.id
+        });
     }
+
+    private async generateAuthCode(user: TUser): Promise<number> {
+        return await this.codeGenerator.generate(
+            CodeType.AUTHENTICATION,
+            user.username,
+            this.AUTHENTICATION_CODE_EXPIRES_IN
+        );
+    }
+
 }
 
 

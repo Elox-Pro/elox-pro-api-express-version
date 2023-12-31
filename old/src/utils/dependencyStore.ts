@@ -1,3 +1,4 @@
+import redis from "../helpers/redisClient";
 import DependencyManager from "../helpers/DependencyManager";
 import IUserService from "../services/IUserService";
 import IEncryptUtils from "./IEncryptUtils";
@@ -67,7 +68,7 @@ export function useEncryptUtils(): IEncryptUtils {
  */
 export function userCodeGenerator(): ICodeGenerator {
     return manager.resolve(CodeGenerator.name, () => {
-        return new CodeGenerator();
+        return new CodeGenerator(config.APP_NAME, redis);
     });
 }
 

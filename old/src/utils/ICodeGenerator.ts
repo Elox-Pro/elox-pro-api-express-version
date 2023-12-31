@@ -1,5 +1,3 @@
-import { RedisClientType } from "redis";
-
 export default interface ICodeGenerator {
     /**
      * Generate a unique code for the given audience and type
@@ -8,6 +6,4 @@ export default interface ICodeGenerator {
      * @param expiredIn the number of seconds until the code expires
      */
     generate(type: string, aud: string, expiredIn: number): Promise<number>;
-    setIssuer(issuer: string): void;
-    setRedisClient(redisClient: RedisClientType): void;
 }

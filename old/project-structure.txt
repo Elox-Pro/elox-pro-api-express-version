@@ -1,0 +1,81 @@
+├── domain/
+│ ├── entities/
+│ | | ├── models/
+│ │ | ├── User.ts
+│ │ | ├── Company.ts
+│ │ │ ├── Country.ts
+│ | ├── params/
+│ │ │ │ ├── UserCreatorParams.ts
+│ │ │ │ ├── UserAuthenticatorParams.ts
+│ │ ├── constants/
+│ │ │ │ ├── UserRole.ts
+│ │ │ │ ├── AuthenticationMethod.ts
+│ ├── interfaces/
+│ | ├── repositories/
+│ │ │ ├── IBaseRepository.ts
+│ | ├── usecases/
+│ │ │ ├── user/
+│ │ │ │ ├── IUserCreator.ts
+│ │ │ │ ├── IUserAuthenticator.ts
+│ │ │ ├── company/
+│ │ │ ├── ICompanyCreator.ts
+│ │ │ ├── ICompanyFinderById.ts
+│ | ├── utils/
+│ │ │ ├── IJsonWebTokenAsync.ts
+│ │ │ ├── IEmailSender.ts
+├── application/
+│ | ├── usecases/
+│ │ │ ├── user/
+│ │ │ │ ├── UserCreator.ts
+│ │ │ │ ├── UserAuthenticator.ts
+│ │ │ ├── company/
+│ │ │ ├── CompanyCreator.ts
+│ │ │ ├── CompanyFinderById.ts
+├── infrastructure/
+│ ├── dependencies/
+│ │ ├── InjectionDependencyContainer.ts
+│ │ ├── RepositoryContainer.ts
+│ │ ├── UtilsContainer.ts
+│ │ ├── UserContainer.ts
+│ │ ├── CompanyContainer.ts
+│ │ ├── EmailContainer.ts
+│ | ├── adapters/
+│ | ├── databases/
+│ | │ ├── clients/
+│ | │ │ ├── PrismaClient.ts
+│ | │ │ ├── RedisClient.ts
+│ | │ ├── seeds/
+│ | │ │ ├── DataBaseSeeder.ts
+│ | ├── notification/
+│ | │ ├── EmailClient.ts
+│ | ├── authentication/
+│ | │ ├── JsonWebTokenUser.ts
+│ | ├── repositories/
+│ | │ ├── UserRepository.ts
+│ | │ ├── CountryRepository.ts
+│ | │ ├── CompanyRepository.ts
+│ | ├── presentation/
+│ | ├── user/
+│ │ | ├── UserController.ts
+│ | ├── country/
+│ │ | ├── CountryController.ts
+│ | ├── company/
+│ │ | ├── CompanyController.ts
+│ │ ├── middleware/
+│ │ │ ├── AuthenticationMiddleware.ts
+│ │ │ ├── AuthorizationMiddleware.ts
+│ ├── config/
+│ │ ├── AppConfig.ts
+│ │ ├── DatabaseConfig.ts
+│ │ ├── EmailConfig.ts
+
+├── tests/
+│ ├── unit/
+│ │ ├── user/
+│ │ │ ├── UserCreator.test.ts
+│ │ │ ├── UserAuthenticator.test.ts
+│ ├── integration/
+│ │ ├── UserController.test.ts
+│ │ ├── CompanyController.test.ts
+
+What do you think about the projec structure? The goal is to create a modular, maintainable, and scalable codebase applying the Onion architecture
