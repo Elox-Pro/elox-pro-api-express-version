@@ -1,3 +1,3 @@
 export default interface ICaseUse<I, O> {
-    execute(data: I): Promise<O>;
+    execute(params: I): Promise<O>;
 }

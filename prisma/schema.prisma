@@ -49,11 +49,11 @@ model User {
   // Flag indicating phone verification status
   phoneVerified Boolean @default(false) @map("phone_verified")
 
-  // Flag indicating if the second authentication is required
-  secondAuthRequired Boolean @default(true) @map("auth_required")
+  // Flag indicating if the second authentication code is required
+  secondAuthCodeRequired Boolean @default(true) @map("second_auth_code_required")
 
-  // The secons authentication method (e.g., email, phone number)
-  secondAuthMethod String? @map("auth_method")
+  // The second authentication code method (e.g., email, phone number)
+  secondAuthCodeMethod String? @map("second_auth_code_method")
 
   // Last login timestamp
   lastLoginAt DateTime? @map("last_login_at")
