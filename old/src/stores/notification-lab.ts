@@ -6,9 +6,7 @@ class User {
         public email: string,
         public slackId: string,
         public notificationType: string,
-    ) {
-
-    }
+    ) { }
 }
 
 export interface INotification {
@@ -36,13 +34,11 @@ class SlackClient implements INotification {
     }
 }
 
-
 class NotificationType {
     public static EMAIL = "EMAIL";
     public static SMS = "SMS";
     public static SLACK = "SLACK";
 }
-
 
 interface INotificationHandler {
     useSecondAuthCodeNotification(): Promise<INotification>;
@@ -97,8 +93,7 @@ class SlackHandler implements INotificationHandler {
     }
 }
 
-
-class NotificationHandler {
+class NotificationStore {
 
     private instances = new Map<string, INotificationHandler>();
 
@@ -112,7 +107,7 @@ class NotificationHandler {
         this.instances.set(NotificationType.SLACK, slackHandler);
     }
 
-    public getInstance(type: string): INotificationHandler {
+    public get(type: string): INotificationHandler {
         const instance = this.instances.get(type);
         if (!instance) {
             throw new Error("Type not found");
@@ -136,7 +131,7 @@ class NotificationHandler {
     const params = new Map<string, string>();
     params.set("code", "123456");
 
-    const userNotifications = new NotificationHandler(
+    const notificationStore = new NotificationStore(
         emailHandler,
         smsHandler,
         slackHandler
@@ -164,7 +159,7 @@ class NotificationHandler {
     const users = [user, user2, user3];
 
     for (const user of users) {
-        const notification = userNotifications.getInstance(user.notificationType);
+        const notification = notificationStore.get(user.notificationType);
         const secondAuthCodeNotification = await notification.useSecondAuthCodeNotification();
         secondAuthCodeNotification.send(user, params);
     }

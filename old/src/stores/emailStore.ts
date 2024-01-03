@@ -36,3 +36,6 @@ export function useSecondCodeAuthEmail(): IEmailNotification {
         });
     });
 }
+
+const secondCodeAuthEmail = useSecondCodeAuthEmail();
+secondCodeAuthEmail.send("<EMAIL>", new Map<string, string>());

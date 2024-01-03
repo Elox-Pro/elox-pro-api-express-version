@@ -1,13 +1,15 @@
+import AuthenticationMethod from "domain/constants/AuthenticationMethod";
+
 export default class User {
 
     // Model fields
     public readonly id: number = 0;
-    public readonly password: string = '';
-    public readonly username: string = '';
-    public readonly createdAt?: Date;
-    public readonly updatedAt?: Date;
+    public readonly createdAt: Date = new Date();
+    public readonly updatedAt: Date = new Date();
     public readonly role?: string;
+    public readonly username: string = '';
     public readonly email?: string;
+    public readonly password: string = '';
     public readonly firstName?: string;
     public readonly lastName?: string;
     public readonly phone?: string;
@@ -16,7 +18,7 @@ export default class User {
     public readonly emailVerified: boolean = false;
     public readonly phoneVerified: boolean = false;
     public readonly secondAuthCodeRequired: boolean = true;
-    public readonly secondAuthCodeMethod?: string;
+    public readonly secondAuthCodeMethod: string = AuthenticationMethod.EMAIL;
     public readonly lastLoginAt?: Date;
 
     // Extra fields

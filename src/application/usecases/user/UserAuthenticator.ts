@@ -3,8 +3,9 @@ import UserAuthenticatorParams from "domain/entities/user/UserAuthenticatorParam
 import IUserRepository from "domain/interfaces/repositories/IUserRepository";
 import IUseCase from "domain/interfaces/usecases/IUseCase";
 import IEncryptUtils from "domain/interfaces/utils/IEncryptUtils";
-import IJwtoken from "domain/interfaces/utils/IJwtGenerator";
+import IJwtoken from "domain/interfaces/utils/IJwtoken";
 import ISecondAuthCode from "domain/interfaces/utils/ISecondAuthCode";
+import INotificationContainer from "notification/interfaces/INotificationContainer";
 import TJwtUserPayload from "domain/types/TJwtUserPayload";
 
 export default class UserAuthenticator implements IUseCase<UserAuthenticatorParams, User> {
@@ -14,7 +15,8 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
         readonly encryptUtils: IEncryptUtils,
         readonly refreshToken: IJwtoken<TJwtUserPayload>,
         readonly accessToken: IJwtoken<TJwtUserPayload>,
-        readonly secondAuthCode: ISecondAuthCode
+        readonly secondAuthCode: ISecondAuthCode,
+        readonly notificationContainer: INotificationContainer<User>
     ) { }
 
     async execute(params: UserAuthenticatorParams): Promise<User> {
@@ -39,20 +41,22 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
             }
 
             // Else the second authentication code is required then create the code, send the    notification to the user and return the user
-
-            // TODO:
-            // 1. Create the second authentication code
-            const code = await this.secondAuthCode.generate(user.username);
-
-            // 2. Send the notification to the user
-            // TODO
-
-            // 2. Send the notification to the user
-            // 3. Return the user
-
+            await this.sendSecondCodeAuthNotification(user);
             return user;
 
 
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    private async sendSecondCodeAuthNotification(user: User) {
+        try {
+            const code = await this.secondAuthCode.generate(user.username);
+            const notificationParams = new Map<string, string>();
+            notificationParams.set('code', String(code));
+            const notification = await this.notificationContainer.getSecondAuthCodeNotification(user.secondAuthCodeMethod);
+            await notification.send(user, notificationParams);
         } catch (error) {
             throw error;
         }
