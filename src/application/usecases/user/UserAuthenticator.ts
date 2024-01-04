@@ -46,7 +46,6 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
             await this.sendSecondCodeAuthNotification(user);
             return user;
 
-
         } catch (error) {
             throw error;
         }

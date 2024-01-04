@@ -27,3 +27,7 @@ export const mockNotificationStore = {
     getSecondAuthCodeNotif: jest.fn(),
     getNotification: jest.fn(),
 };
+
+export const mockCountryRepository = {
+    createMany: jest.fn(),
+}

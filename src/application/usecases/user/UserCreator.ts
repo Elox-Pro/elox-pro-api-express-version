@@ -1,11 +1,11 @@
 import User from "domain/entities/user/User";
 import UserCreatorParams from "domain/entities/user/UserCreatorParams";
-import ICaseUse from "domain/interfaces/usecases/IUseCase";
+import IUseCase from "domain/interfaces/usecases/IUseCase";
 import IUserRepository from "domain/interfaces/repositories/IUserRepository";
 import IEncryptUtils from "domain/interfaces/utils/IEncryptUtils";
 import PasswordMismatchError from "domain/errors/PasswordMismatchError";
 
-export default class UserCreator implements ICaseUse<UserCreatorParams, User> {
+export default class UserCreator implements IUseCase<UserCreatorParams, User> {
 
     constructor(
         readonly userRepository: IUserRepository,
