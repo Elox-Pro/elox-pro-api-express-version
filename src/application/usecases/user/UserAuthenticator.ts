@@ -5,8 +5,10 @@ import IUseCase from "domain/interfaces/usecases/IUseCase";
 import IEncryptUtils from "domain/interfaces/utils/IEncryptUtils";
 import IJwtoken from "domain/interfaces/utils/IJwtoken";
 import ISecondAuthCode from "domain/interfaces/utils/ISecondAuthCode";
-import INotificationContainer from "notification/interfaces/INotificationContainer";
 import TJwtUserPayload from "domain/types/TJwtUserPayload";
+import IUserNotificationStore from "domain/interfaces/notification/user/IUserNotificationStore";
+import UserNotFoundError from "domain/errors/UserNotFoundError";
+import InvalidPasswordError from "domain/errors/InvalidPasswordError";
 
 export default class UserAuthenticator implements IUseCase<UserAuthenticatorParams, User> {
 
@@ -16,7 +18,7 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
         readonly refreshToken: IJwtoken<TJwtUserPayload>,
         readonly accessToken: IJwtoken<TJwtUserPayload>,
         readonly secondAuthCode: ISecondAuthCode,
-        readonly notificationContainer: INotificationContainer<User>
+        readonly notificationStore: IUserNotificationStore
     ) { }
 
     async execute(params: UserAuthenticatorParams): Promise<User> {
@@ -27,16 +29,16 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
             const user = await this.userRepository.findUniqueByUsername(username);
 
             if (!user) {
-                throw new Error('User not found');
+                throw new UserNotFoundError(username);
             }
 
-            if (!this.encryptUtils.isPasswordMatched(password, user.password)) {
-                throw new Error('Passwords do not match');
+            if (!await this.encryptUtils.isPasswordMatched(password, user.password)) {
+                throw new InvalidPasswordError(username);
             }
 
             // If the second authentication is not required create the access token and refresh token and return the user
             if (!user.secondAuthCodeRequired) {
-                this.fillJwtokens(user);
+                await this.fillJwtokens(user);
                 return user;
             }
 
@@ -55,7 +57,8 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
             const code = await this.secondAuthCode.generate(user.username);
             const notificationParams = new Map<string, string>();
             notificationParams.set('code', String(code));
-            const notification = await this.notificationContainer.getSecondAuthCodeNotification(user.secondAuthCodeMethod);
+            const notification = await this.notificationStore.getSecondAuthCodeNotif(
+                user.secondAuthCodeMethod);
             await notification.send(user, notificationParams);
         } catch (error) {
             throw error;
@@ -64,10 +67,10 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
 
     private async fillJwtokens(user: User): Promise<void> {
         try {
-            user.accessToken = await this.accessToken.signAsync({
+            user.refreshToken = await this.refreshToken.signAsync({
                 userId: user.id
             });
-            user.refreshToken = await this.refreshToken.signAsync({
+            user.accessToken = await this.accessToken.signAsync({
                 userId: user.id
             });
         } catch (error) {

@@ -1,5 +1,5 @@
-import INotification from "notification/interfaces/INotification";
-import EmailParams from "notification/params/EmailParams";
+import INotification from "features/notification/core/interfaces/INotification";
+import EmailParams from "features/notification/clients/params/EmailParams";
 
 export default class EmailClient<T> implements INotification<T>{
 

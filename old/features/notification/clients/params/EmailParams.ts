@@ -1,4 +1,4 @@
-import ITemplateRenderer from "notification/interfaces/ITemplateRenderer";
+import ITemplateRenderer from "../../core/interfaces/ITemplateRenderer";
 
 export default class EmailParams {
     constructor(

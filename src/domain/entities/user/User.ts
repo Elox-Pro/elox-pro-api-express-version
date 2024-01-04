@@ -1,4 +1,4 @@
-import AuthenticationMethod from "domain/constants/AuthenticationMethod";
+import NotificationType from "domain/constants/NotificationType";
 
 export default class User {
 
@@ -18,7 +18,7 @@ export default class User {
     public readonly emailVerified: boolean = false;
     public readonly phoneVerified: boolean = false;
     public readonly secondAuthCodeRequired: boolean = true;
-    public readonly secondAuthCodeMethod: string = AuthenticationMethod.EMAIL;
+    public readonly secondAuthCodeMethod: string = NotificationType.EMAIL;
     public readonly lastLoginAt?: Date;
 
     // Extra fields

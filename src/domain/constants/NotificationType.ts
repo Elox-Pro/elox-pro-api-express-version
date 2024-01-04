@@ -1,4 +1,4 @@
-export default class AuthenticationMethod {
+export default class NotificationType {
     static readonly EMAIL = "EMAIL";
     static readonly SMS = "SMS";
 }

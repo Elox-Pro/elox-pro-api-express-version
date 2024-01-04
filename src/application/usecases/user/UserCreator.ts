@@ -3,6 +3,7 @@ import UserCreatorParams from "domain/entities/user/UserCreatorParams";
 import ICaseUse from "domain/interfaces/usecases/IUseCase";
 import IUserRepository from "domain/interfaces/repositories/IUserRepository";
 import IEncryptUtils from "domain/interfaces/utils/IEncryptUtils";
+import PasswordMismatchError from "domain/errors/PasswordMismatchError";
 
 export default class UserCreator implements ICaseUse<UserCreatorParams, User> {
 
@@ -20,7 +21,7 @@ export default class UserCreator implements ICaseUse<UserCreatorParams, User> {
             } = params;
 
             if (password1 !== password2) {
-                throw new Error('Passwords do not match');
+                throw new PasswordMismatchError();
             }
 
             const hashedPassword = await this.encryptUtils.hashPassword(password1);

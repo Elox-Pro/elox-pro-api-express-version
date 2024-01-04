@@ -1,20 +1,21 @@
 import UserCreator from 'application/usecases/user/UserCreator';
 import UserCreatorParams from 'domain/entities/user/UserCreatorParams';
 import User from 'domain/entities/user/User';
+import { mockUserRepository, mockEncryptUtils } from './mocks';
+import PasswordMismatchError from 'domain/errors/PasswordMismatchError';
 
 jest.mock('domain/interfaces/repositories/IUserRepository');
 jest.mock('domain/interfaces/utils/IEncryptUtils');
 
 describe('UserCreator', () => {
 
-    let userRepository: any;
-    let encryptUtils: any;
     let userCreator: UserCreator;
 
     beforeEach(() => {
-        userRepository = { create: jest.fn() };
-        encryptUtils = { hashPassword: jest.fn() };
-        userCreator = new UserCreator(userRepository, encryptUtils);
+        userCreator = new UserCreator(
+            mockUserRepository,
+            mockEncryptUtils
+        );
     });
 
     it('should create a user when passwords match', async () => {
@@ -28,14 +29,14 @@ describe('UserCreator', () => {
             emailVerified: true
         };
         const hashedPassword = 'hashed_password';
-        encryptUtils.hashPassword.mockResolvedValue(hashedPassword);
+        mockEncryptUtils.hashPassword.mockResolvedValue(hashedPassword);
         const expectedUser = new User(Object.assign(params, { password: hashedPassword }));
-        userRepository.create.mockResolvedValue(expectedUser);
+        mockUserRepository.create.mockResolvedValue(expectedUser);
 
         const user = await userCreator.execute(params);
 
-        expect(encryptUtils.hashPassword).toHaveBeenCalledWith(params.password1);
-        expect(userRepository.create).toHaveBeenCalledWith(expectedUser);
+        expect(mockEncryptUtils.hashPassword).toHaveBeenCalledWith(params.password1);
+        expect(mockUserRepository.create).toHaveBeenCalledWith(expectedUser);
         expect(user).toBe(expectedUser);
     });
 
@@ -49,6 +50,8 @@ describe('UserCreator', () => {
             role: 'user',
             emailVerified: true
         };
-        await expect(userCreator.execute(params)).rejects.toThrow('Passwords do not match');
+        await expect(userCreator.execute(params)).rejects.toThrow(
+            new PasswordMismatchError()
+        );
     });
 });
