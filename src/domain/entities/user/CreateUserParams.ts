@@ -1,4 +1,4 @@
-export default class UserCreatorParams {
+export default class CreateUserParams {
     constructor(
         public readonly username: string,
         public readonly email: string,

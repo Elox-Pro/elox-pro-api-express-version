@@ -1,4 +1,4 @@
-export default class UserAuthenticatorParams {
+export default class AuthenticateUserParams {
     constructor(
         public readonly username: string,
         public readonly password: string

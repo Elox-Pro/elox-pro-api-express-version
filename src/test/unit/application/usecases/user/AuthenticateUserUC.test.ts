@@ -1,7 +1,7 @@
 import User from "domain/entities/user/User";
-import UserAuthenticator from "application/usecases/user/UserAuthenticator";
-import UserAuthenticatorParams from "domain/entities/user/UserAuthenticatorParams";
-import { mockUserRepository, mockEncryptUtils, mockAccessToken, mockRefreshToken, mockSecondAuthCode, mockNotificationStore } from './mocks';
+import AuthenticateUserUC from "application/usecases/user/AuthenticateUserUC";
+import AuthenticateUserParams from "domain/entities/user/AuthenticateUserParams";
+import { mockUserRepository, mockEncryptUtils, mockAccessToken, mockRefreshToken, mockSecondAuthCode, mockNotificationStore } from '../mocks';
 import NotificationType from "domain/constants/NotificationType";
 import UserNotFoundError from "domain/errors/UserNotFoundError";
 import InvalidPasswordError from "domain/errors/InvalidPasswordError";
@@ -12,11 +12,11 @@ jest.mock("domain/interfaces/utils/IJwtoken");
 jest.mock("domain/interfaces/utils/ISecondAuthCode");
 jest.mock("domain/interfaces/notification/user/IUserNotificationStore");
 
-describe('UserAuthenticator', () => {
-    let userAuthenticator: UserAuthenticator;
+describe('UserAuthenticatorUC', () => {
+    let userAuthenticator: AuthenticateUserUC;
 
     beforeEach(() => {
-        userAuthenticator = new UserAuthenticator(
+        userAuthenticator = new AuthenticateUserUC(
             mockUserRepository,
             mockEncryptUtils,
             mockRefreshToken,
@@ -43,7 +43,7 @@ describe('UserAuthenticator', () => {
                 send: jest.fn()
             });
 
-            const params = new UserAuthenticatorParams('test', 'password');
+            const params = new AuthenticateUserParams('test', 'password');
             const result = await userAuthenticator.execute(params);
 
             expect(result).toBe(user);
@@ -65,7 +65,7 @@ describe('UserAuthenticator', () => {
             mockRefreshToken.signAsync.mockResolvedValueOnce('refresh_token');
             mockAccessToken.signAsync.mockResolvedValueOnce('access_token');
 
-            const params = new UserAuthenticatorParams('test', 'password');
+            const params = new AuthenticateUserParams('test', 'password');
             const result = await userAuthenticator.execute(params);
 
             expect(result).toBe(user);
@@ -75,7 +75,7 @@ describe('UserAuthenticator', () => {
 
         it('should throw an error if user not found', async () => {
             mockUserRepository.findUniqueByUsername.mockResolvedValueOnce(null);
-            const params = new UserAuthenticatorParams('test', 'password');
+            const params = new AuthenticateUserParams('test', 'password');
             await expect(userAuthenticator.execute(params)).rejects.toThrow(
                 new UserNotFoundError(params.username)
             );
@@ -85,7 +85,7 @@ describe('UserAuthenticator', () => {
             const user = new User({ username: 'test', password: 'password' });
             mockUserRepository.findUniqueByUsername.mockResolvedValueOnce(user);
             mockEncryptUtils.isPasswordMatched.mockResolvedValueOnce(false);
-            const params = new UserAuthenticatorParams('test', 'password-x');
+            const params = new AuthenticateUserParams('test', 'password-x');
             await expect(userAuthenticator.execute(params)).rejects.toThrow(
                 new InvalidPasswordError(params.username)
             );

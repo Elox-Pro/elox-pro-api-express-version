@@ -1,5 +1,5 @@
 import User from "domain/entities/user/User";
-import UserAuthenticatorParams from "domain/entities/user/UserAuthenticatorParams";
+import AuthenticateUserParams from "domain/entities/user/AuthenticateUserParams";
 import IUserRepository from "domain/interfaces/repositories/IUserRepository";
 import IUseCase from "domain/interfaces/usecases/IUseCase";
 import IEncryptUtils from "domain/interfaces/utils/IEncryptUtils";
@@ -9,8 +9,9 @@ import TJwtUserPayload from "domain/types/TJwtUserPayload";
 import IUserNotificationStore from "domain/interfaces/notification/user/IUserNotificationStore";
 import UserNotFoundError from "domain/errors/UserNotFoundError";
 import InvalidPasswordError from "domain/errors/InvalidPasswordError";
+import FieldRequiredError from "domain/errors/FieldRequiredError";
 
-export default class UserAuthenticator implements IUseCase<UserAuthenticatorParams, User> {
+export default class AuthenticateUserUC implements IUseCase<AuthenticateUserParams, User> {
 
     constructor(
         readonly userRepository: IUserRepository,
@@ -21,7 +22,7 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
         readonly notificationStore: IUserNotificationStore
     ) { }
 
-    async execute(params: UserAuthenticatorParams): Promise<User> {
+    async execute(params: AuthenticateUserParams): Promise<User> {
         try {
 
             const { username, password } = params;
@@ -43,6 +44,7 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
             }
 
             // Else the second authentication code is required then create the code, send the    notification to the user and return the user
+
             await this.sendSecondCodeAuthNotification(user);
             return user;
 
@@ -53,6 +55,11 @@ export default class UserAuthenticator implements IUseCase<UserAuthenticatorPara
 
     private async sendSecondCodeAuthNotification(user: User) {
         try {
+
+            if (!user.secondAuthCodeMethod) {
+                throw new FieldRequiredError("secondAuthCodeMethod");
+            }
+
             const code = await this.secondAuthCode.generate(user.username);
             const notificationParams = new Map<string, string>();
             notificationParams.set('code', String(code));

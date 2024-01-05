@@ -3,7 +3,7 @@ import CreateCountryParams from "domain/entities/country/CreateCountryParams";
 import ICountryRepository from "domain/interfaces/repositories/ICountryRepository";
 import IUseCase from "domain/interfaces/usecases/IUseCase";
 
-export default class CreateManyCountriesUC implements IUseCase<CreateCountryParams, Number> {
+export default class CreateCountriesUC implements IUseCase<CreateCountryParams, Number> {
 
     constructor(private countryRepository: ICountryRepository) { }
     async execute(params: CreateCountryParams[]): Promise<Number> {

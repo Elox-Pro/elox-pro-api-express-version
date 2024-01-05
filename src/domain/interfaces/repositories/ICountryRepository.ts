@@ -1,3 +1,4 @@
 import Country from "domain/entities/country/Country";
-import IRepository from "./IRepository";
-export default interface ICountryRepository extends IRepository<Country> { }
+export default interface ICountryRepository {
+    createMany(countries: Country[]): Promise<Number>;
+}

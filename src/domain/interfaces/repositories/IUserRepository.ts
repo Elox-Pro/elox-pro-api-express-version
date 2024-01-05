@@ -1,7 +1,7 @@
 import User from "domain/entities/user/User";
-import IRepository from "./IRepository";
-export default interface IUserRepository extends IRepository<User> {
+export default interface IUserRepository {
 
-    findUniqueByUsername(username: string): Promise<User>;
+    createOne(user: User): Promise<User>;
+    findUniqueByUsername(username: string): Promise<User | null>;
 
 }

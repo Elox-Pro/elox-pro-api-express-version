@@ -1,6 +1,5 @@
-
 export const mockUserRepository = {
-    create: jest.fn(),
+    createOne: jest.fn(),
     findUniqueByUsername: jest.fn(),
 };
 
