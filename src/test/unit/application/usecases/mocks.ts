@@ -1,3 +1,11 @@
+jest.mock("domain/interfaces/authentication/IAccessToken");
+jest.mock("domain/interfaces/authentication/IAuthenticationCode");
+jest.mock("domain/interfaces/authentication/IRefreshToken");
+jest.mock('domain/interfaces/repositories/ICountryRepository');
+jest.mock("domain/interfaces/repositories/IUserRepository");
+jest.mock("domain/interfaces/notification/user/IUserNotificationStore");
+jest.mock("domain/interfaces/utils/IEncryptUtils");
+
 export const mockUserRepository = {
     createOne: jest.fn(),
     findUniqueByUsername: jest.fn(),

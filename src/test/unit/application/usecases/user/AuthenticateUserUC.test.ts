@@ -1,16 +1,18 @@
 import User from "domain/entities/user/User";
 import AuthenticateUserUC from "application/usecases/user/AuthenticateUserUC";
 import AuthenticateUserParams from "domain/entities/user/AuthenticateUserParams";
-import { mockUserRepository, mockEncryptUtils, mockAccessToken, mockRefreshToken, mockSecondAuthCode, mockNotificationStore } from '../mocks';
 import NotificationType from "domain/constants/NotificationType";
 import UserNotFoundError from "domain/errors/UserNotFoundError";
 import InvalidPasswordError from "domain/errors/InvalidPasswordError";
 
-jest.mock("domain/interfaces/repositories/IUserRepository");
-jest.mock("domain/interfaces/utils/IEncryptUtils");
-jest.mock("domain/interfaces/utils/IJwtoken");
-jest.mock("domain/interfaces/utils/ISecondAuthCode");
-jest.mock("domain/interfaces/notification/user/IUserNotificationStore");
+import {
+    mockUserRepository,
+    mockEncryptUtils,
+    mockAccessToken,
+    mockRefreshToken,
+    mockSecondAuthCode,
+    mockNotificationStore
+} from '../mocks';
 
 describe('UserAuthenticatorUC', () => {
     let userAuthenticator: AuthenticateUserUC;

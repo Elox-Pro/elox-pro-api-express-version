@@ -1,26 +1,42 @@
+import 'reflect-metadata';
+import { inject, injectable } from "inversify";
+import { TInversify } from "domain/types/TInversify";
 import User from "domain/entities/user/User";
 import AuthenticateUserParams from "domain/entities/user/AuthenticateUserParams";
 import IUserRepository from "domain/interfaces/repositories/IUserRepository";
 import IUseCase from "domain/interfaces/usecases/IUseCase";
 import IEncryptUtils from "domain/interfaces/utils/IEncryptUtils";
-import IJwtoken from "domain/interfaces/utils/IJwtoken";
-import ISecondAuthCode from "domain/interfaces/utils/ISecondAuthCode";
-import TJwtUserPayload from "domain/types/TJwtUserPayload";
+import IRefreshToken from "domain/interfaces/authentication/IRefreshToken";
+import IAccessToken from "domain/interfaces/authentication/IAccessToken";
+import IAuthenticationCode from "domain/interfaces/authentication/IAuthenticationCode";
 import IUserNotificationStore from "domain/interfaces/notification/user/IUserNotificationStore";
 import UserNotFoundError from "domain/errors/UserNotFoundError";
 import InvalidPasswordError from "domain/errors/InvalidPasswordError";
-import FieldRequiredError from "domain/errors/FieldRequiredError";
+import RequiredFieldError from "domain/errors/RequiredFieldError";
 
+@injectable()
 export default class AuthenticateUserUC implements IUseCase<AuthenticateUserParams, User> {
 
-    constructor(
-        readonly userRepository: IUserRepository,
-        readonly encryptUtils: IEncryptUtils,
-        readonly refreshToken: IJwtoken<TJwtUserPayload>,
-        readonly accessToken: IJwtoken<TJwtUserPayload>,
-        readonly secondAuthCode: ISecondAuthCode,
-        readonly notificationStore: IUserNotificationStore
-    ) { }
+    constructor
+        (
+            @inject(TInversify.IUserRepository)
+            readonly userRepository: IUserRepository,
+
+            @inject(TInversify.IEncryptUtils)
+            readonly encryptUtils: IEncryptUtils,
+
+            @inject(TInversify.IRefreshToken)
+            readonly refreshToken: IRefreshToken,
+
+            @inject(TInversify.IRefreshToken)
+            readonly accessToken: IAccessToken,
+
+            @inject(TInversify.IAuthenticationCode)
+            readonly authenticationCode: IAuthenticationCode,
+
+            @inject(TInversify.IUserNotificationStore)
+            readonly notifStore: IUserNotificationStore
+        ) { }
 
     async execute(params: AuthenticateUserParams): Promise<User> {
         try {
@@ -57,15 +73,18 @@ export default class AuthenticateUserUC implements IUseCase<AuthenticateUserPara
         try {
 
             if (!user.secondAuthCodeMethod) {
-                throw new FieldRequiredError("secondAuthCodeMethod");
+                throw new RequiredFieldError("secondAuthCodeMethod");
             }
 
-            const code = await this.secondAuthCode.generate(user.username);
-            const notificationParams = new Map<string, string>();
-            notificationParams.set('code', String(code));
-            const notification = await this.notificationStore.getSecondAuthCodeNotif(
-                user.secondAuthCodeMethod);
-            await notification.send(user, notificationParams);
+            const notif = await this.notifStore.getSecondAuthCodeNotif(
+                user.secondAuthCodeMethod
+            );
+
+            const code = await this.authenticationCode.generate(user.username);
+            const notifParams = new Map<string, string>();
+
+            await notif.send(user, notifParams.set('code', String(code)));
+
         } catch (error) {
             throw error;
         }

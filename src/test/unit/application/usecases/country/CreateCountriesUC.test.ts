@@ -2,8 +2,6 @@ import CreateCountriesUC from 'application/usecases/country/CreateCountriesUC';
 import CreateCountryParams from 'domain/entities/country/CreateCountryParams';
 import { mockCountryRepository } from '../mocks';
 
-jest.mock('domain/interfaces/repositories/ICountryRepository');
-
 describe('CreateCountriesUC', () => {
 
     let createCountriesUC: CreateCountriesUC;

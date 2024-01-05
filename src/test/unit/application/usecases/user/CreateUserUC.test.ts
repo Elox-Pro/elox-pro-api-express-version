@@ -4,9 +4,6 @@ import User from 'domain/entities/user/User';
 import { mockUserRepository, mockEncryptUtils } from '../mocks';
 import PasswordMismatchError from 'domain/errors/PasswordMismatchError';
 
-jest.mock('domain/interfaces/repositories/IUserRepository');
-jest.mock('domain/interfaces/utils/IEncryptUtils');
-
 describe('CreateUserUC', () => {
 
     let userCreator: CreateUserUC;
