@@ -4,6 +4,7 @@ const TInversify = {
     ICountryRepository: Symbol.for("ICountryRepository"),
     IEncryptUtils: Symbol.for("IEncryptUtils"),
     IRefreshToken: Symbol.for("IRefreshToken"),
+    IUseCase: Symbol.for("IUseCase"),
     IUserNotificationStore: Symbol.for("IUserNotificationStore"),
     IUserPayload: Symbol.for("IUserPayload"),
     IUserRepository: Symbol.for("IUserRepository"),
